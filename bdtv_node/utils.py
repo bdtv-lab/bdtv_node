@@ -1,13 +1,10 @@
-import json
-
 import mcdreforged as mcdr
 import requests
 from mcdreforged.api.decorator import new_thread
-from websocket import WebSocketException
 
 from whitelist_api import get_whitelist
 
-from . import state
+from . import state, ws_events
 from .types import Player, Server
 
 
@@ -29,26 +26,6 @@ def pure_players(players_name: list[str]) -> list[Player]:
     ]
 
     return real_players
-
-
-def post_heartbeat_anyway(players: list[Player]):
-    """
-    尝试发送心跳，无论是否成功
-    """
-
-    json_data = {
-        "action": "heartbeat",
-        "data": {
-            "players": players,
-            "server": state.server_data,
-        },
-    }
-
-    # 立刻 Beat 一次
-    try:
-        state.ws.send(json.dumps(json_data))
-    except WebSocketException as _:
-        pass
 
 
 def try_get_motd(server: mcdr.ServerInterface) -> mcdr.RTextBase | None:
@@ -92,7 +69,7 @@ def handle_player_join(server: mcdr.PluginServerInterface, player: Player):
     真实玩家加入游戏时的处理函数
     """
 
-    post_heartbeat_anyway([player])
+    ws_events.heartbeat([player])
 
     # 尝试给玩家展示 motd
     if motd := try_get_motd(server):

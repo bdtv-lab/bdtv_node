@@ -2,8 +2,8 @@ from mcdreforged.api.decorator import new_thread
 
 from online_player_api import get_player_list
 
-from . import state
-from .utils import post_heartbeat_anyway, pure_players
+from . import state, ws_events
+from .utils import pure_players
 
 
 @new_thread("Heartbeat")
@@ -19,7 +19,7 @@ def start_heartbeat(delay: float = 5.0):
         # 并筛选出白名单中的玩家
         players = pure_players(get_player_list())
 
-        post_heartbeat_anyway(players)
+        ws_events.heartbeat(players)
 
         state.stop_heartbeat.wait(delay)
     logger.info("Bye!")

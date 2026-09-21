@@ -1,5 +1,6 @@
 import logging
 import threading
+from concurrent.futures import ThreadPoolExecutor
 
 import mcdreforged as mcdr
 from websocket import WebSocketApp
@@ -20,9 +21,19 @@ def on_player_joined(server: mcdr.PluginServerInterface, player: str, info: mcdr
         handle_player_join(server, real_player[0])  # type: ignore[operator]
 
 
+def on_user_info(server: mcdr.PluginServerInterface, info: mcdr.Info):
+    if not info.is_player:
+        return
+
+    state.logger.info(info.content)
+
+
 def on_load(server: mcdr.PluginServerInterface, prev_module):
     state.logger = server.logger
     logger = state.logger
+
+    logger.info("分配线程池")
+    state.threadpool_for_ws = ThreadPoolExecutor(max_workers=4)
 
     config = load_or_init_config(server)
     logger.info("配置文件已加载")
@@ -68,3 +79,6 @@ def on_unload(server: mcdr.PluginServerInterface):
     logger.info("等待 WebSocket 线程终止")
     state.ws.close()
     state.ws_thread.join()
+
+    logger.info("等待线程池终止")
+    state.threadpool_for_ws.shutdown(wait=True)
