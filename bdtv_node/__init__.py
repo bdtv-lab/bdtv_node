@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 import mcdreforged as mcdr
 from websocket import WebSocketApp
 
-from . import state
+from . import state, ws_events
 from .commands import register_command
 from .config import load_or_init_config
 from .heart import start_heartbeat
@@ -22,10 +22,17 @@ def on_player_joined(server: mcdr.PluginServerInterface, player: str, info: mcdr
 
 
 def on_user_info(server: mcdr.PluginServerInterface, info: mcdr.Info):
-    if not info.is_player:
+    if not info.is_player or not info.player:
         return
 
+    player = pure_players([info.player])
+    if len(player) < 1:
+        return
+    player = player[0]
+
     state.logger.info(info.content)
+
+    ws_events.player_chat(player, info.content if info.content is not None else "")
 
 
 def on_load(server: mcdr.PluginServerInterface, prev_module):
