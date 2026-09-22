@@ -57,7 +57,7 @@ def on_load(server: mcdr.PluginServerInterface, prev_module):
 
     logging.getLogger("websocket").setLevel(logging.WARNING)
     state.ws = WebSocketApp(
-        f"{config['bdtv_hub_base'].replace('https://', 'wss://').replace('http://', 'ws://')}/ws",
+        f"{config['bdtv_hub_base'].replace('https://', 'wss://').replace('http://', 'ws://')}/ws?slug={config['server_slug']}",
         on_message=handle_message,
         on_open=lambda ws: logger.info("与 hub 的 WebSocket 连接已建立"),
         on_error=lambda ws, e: logger.error(f"与 hub 的 WebSocket 连接出现错误: {e}"),
