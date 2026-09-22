@@ -36,6 +36,8 @@ def on_user_info(server: mcdr.PluginServerInterface, info: mcdr.Info):
 
 
 def on_load(server: mcdr.PluginServerInterface, prev_module):
+    state.server_interface = server
+
     state.logger = server.logger
     logger = state.logger
 

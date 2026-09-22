@@ -2,11 +2,13 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 from logging import Logger
 
+import mcdreforged as mcdr
 from mcdreforged import FunctionThread
 from websocket import WebSocketApp
 
 from .types import Server
 
+server_interface: mcdr.PluginServerInterface
 # 日志记录器
 logger: Logger
 # BDTV hub 请求地址
