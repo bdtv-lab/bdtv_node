@@ -30,8 +30,6 @@ def on_user_info(server: mcdr.PluginServerInterface, info: mcdr.Info):
         return
     player = player[0]
 
-    state.logger.info(info.content)
-
     ws_events.player_chat(player, info.content if info.content is not None else "")
 
 

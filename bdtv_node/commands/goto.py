@@ -96,9 +96,6 @@ def switch_server(src: mcdr.CommandSource, ctx: mcdr.CommandContext):
         # 构造转移命令并执行
         command = f"/transfer {server['address']} {server['port']} {player_name}"
         src.get_server().execute(command)
-        src.get_server().say(
-            mcdr.RTextList(f"§e{player_name}前往了{server['nickname']}§r")
-        )
         break
     # 如果没有匹配的服务器
     else:

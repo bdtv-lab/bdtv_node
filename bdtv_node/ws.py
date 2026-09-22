@@ -1,5 +1,6 @@
 import json
 
+import mcdreforged as mcdr
 from mcdreforged.api.decorator import new_thread
 from websocket import WebSocketApp
 
@@ -48,3 +49,13 @@ def handle_message(ws: WebSocketApp, data):
 
         case "console_sent_msg":
             server.say(f"[Server] {event_data}")
+
+        case "player_join":
+            s: Server = event_data["server"]
+            p: Player = event_data["player"]
+            server.say(mcdr.RTextList(f"§e{p['nickname']}加入了{s['nickname']}§r"))
+
+        case "player_left":
+            s: Server = event_data["server"]
+            p: Player = event_data["player"]
+            server.say(mcdr.RTextList(f"§e{p['nickname']}离开了{s['nickname']}§r"))
