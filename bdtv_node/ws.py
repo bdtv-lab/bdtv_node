@@ -45,3 +45,6 @@ def handle_message(ws: WebSocketApp, data):
             source: Server = event_data["source"]
             message = event_data["message"]
             server.say(f"{source['nickname']} <{sender['nickname']}> {message}")
+
+        case "console_sent_msg":
+            server.say(f"[Server] {event_data}")
