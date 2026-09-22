@@ -3,6 +3,10 @@ import json
 from mcdreforged.api.decorator import new_thread
 from websocket import WebSocketApp
 
+from bdtv_node.types import Player, Server
+from bdtv_node.utils import pure_players
+from online_player_api import get_player_list
+
 from . import state, ws_events
 
 
@@ -14,7 +18,8 @@ def start_ws(delay: float = 5.0):
 
 def on_reconnect(ws: WebSocketApp):
     state.logger.info("已重新与 hub 建立 WebSocket 连接")
-    ws_events.heartbeat([])
+    players = pure_players(get_player_list())
+    ws_events.heartbeat(players)
 
 
 def handle_message(ws: WebSocketApp, data):
@@ -28,8 +33,15 @@ def handle_message(ws: WebSocketApp, data):
         return
     logger.info(f"接收到事件: {event_type}")
 
+    # 处理来自服务器的事件
     match event_type:
         case "group_member_sent_msg":
-            sender = event_data["sender_nickname"]
+            sender_nickname = event_data["sender_nickname"]
             message = event_data["message"]
-            server.say(f"QQ <{sender}> {message}")
+            server.say(f"QQ <{sender_nickname}> {message}")
+
+        case "client_sent_msg":
+            sender: Player = event_data["sender"]
+            source: Server = event_data["source"]
+            message = event_data["message"]
+            server.say(f"{source['nickname']} <{sender['nickname']}> {message}")
